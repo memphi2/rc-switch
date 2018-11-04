@@ -40,7 +40,7 @@
     #define memcpy_P(dest, src, num) memcpy((dest), (src), (num))
 #endif
 
-#if defined(ESP8266) || defined(ESP32)
+#ifdef ESP8266
     // interrupt handler and related code must be in RAM on ESP8266,
     // according to issue #46.
     #define RECEIVE_ATTR ICACHE_RAM_ATTR
@@ -68,7 +68,7 @@
  *
  * These are combined to form Tri-State bits when sending or receiving codes.
  */
-#if defined(ESP8266) || defined(ESP32)
+#ifdef ESP8266
 static const RCSwitch::Protocol proto[] = {
 #else
 static const RCSwitch::Protocol PROGMEM proto[] = {
@@ -78,8 +78,7 @@ static const RCSwitch::Protocol PROGMEM proto[] = {
   { 100, { 30, 71 }, {  4, 11 }, {  9,  6 }, false },    // protocol 3
   { 380, {  1,  6 }, {  1,  3 }, {  3,  1 }, false },    // protocol 4
   { 500, {  6, 14 }, {  1,  2 }, {  2,  1 }, false },    // protocol 5
-  { 450, { 23,  1 }, {  1,  2 }, {  2,  1 }, true },      // protocol 6 (HT6P20B)
-  { 150, {  2, 62 }, {  1,  6 }, {  6,  1 }, false }     // protocol 7 (HS2303-PT, i. e. used in AUKEY Remote)
+  { 450, { 23,  1 }, {  1,  2 }, {  2,  1 }, true }      // protocol 6 (HT6P20B)
 };
 
 enum {
@@ -87,10 +86,10 @@ enum {
 };
 
 #if not defined( RCSwitchDisableReceiving )
-volatile unsigned long RCSwitch::nReceivedValue = 0;
-volatile unsigned int RCSwitch::nReceivedBitlength = 0;
-volatile unsigned int RCSwitch::nReceivedDelay = 0;
-volatile unsigned int RCSwitch::nReceivedProtocol = 0;
+unsigned long RCSwitch::nReceivedValue = 0;
+unsigned int RCSwitch::nReceivedBitlength = 0;
+unsigned int RCSwitch::nReceivedDelay = 0;
+unsigned int RCSwitch::nReceivedProtocol = 0;
 int RCSwitch::nReceiveTolerance = 60;
 const unsigned int RCSwitch::nSeparationLimit = 4300;
 // separationLimit: minimum microseconds between received codes, closer codes are ignored.
@@ -124,7 +123,7 @@ void RCSwitch::setProtocol(int nProtocol) {
   if (nProtocol < 1 || nProtocol > numProto) {
     nProtocol = 1;  // TODO: trigger an error, e.g. "bad protocol" ???
   }
-#if defined(ESP8266) || defined(ESP32)
+#ifdef ESP8266
   this->protocol = proto[nProtocol-1];
 #else
   memcpy_P(&this->protocol, &proto[nProtocol-1], sizeof(Protocol));
@@ -463,6 +462,44 @@ void RCSwitch::sendTriState(const char* sCodeWord) {
   this->send(code, length);
 }
 
+void RCSwitch::sendMC(char* sCodeWord, int dataLength, int syncLength, int sendCommand, int sendDelay  ) {
+
+  for (int nRepeat=0; nRepeat<sendCommand; nRepeat++) {
+	digitalWrite(this->nTransmitterPin, LOW);  
+	  
+    for (int i = 0; i < strlen(sCodeWord); i++) {
+				switch (sCodeWord[i]) {
+					case '2':
+						digitalWrite(this->nTransmitterPin, LOW);
+						delayMicroseconds(syncLength);
+						break;
+
+					case '3':
+						digitalWrite(this->nTransmitterPin, HIGH);
+						delayMicroseconds(syncLength);
+						break;
+
+					case '0':
+						digitalWrite(this->nTransmitterPin, HIGH);
+						delayMicroseconds(dataLength/2);
+						digitalWrite(this->nTransmitterPin, LOW);
+						delayMicroseconds(dataLength/2);
+						break;
+
+					case '1':
+						digitalWrite(this->nTransmitterPin, LOW);
+						delayMicroseconds(dataLength/2);
+						digitalWrite(this->nTransmitterPin, HIGH);
+						delayMicroseconds(dataLength/2);
+						break;
+				}
+			}
+			digitalWrite(this->nTransmitterPin, LOW);    
+			if (nRepeat != sendCommand-1)
+			delayMicroseconds(sendDelay);
+  }
+}
+
 /**
  * @param sCodeWord   a binary code word consisting of the letter 0, 1
  */
@@ -505,9 +542,6 @@ void RCSwitch::send(unsigned long code, unsigned int length) {
     }
     this->transmit(protocol.syncFactor);
   }
-
-  // Disable transmit after sending (i.e., for inverted protocols)
-  digitalWrite(this->nTransmitterPin, LOW);
 
 #if not defined( RCSwitchDisableReceiving )
   // enable receiver again if we just disabled it
@@ -599,7 +633,7 @@ static inline unsigned int diff(int A, int B) {
  *
  */
 bool RECEIVE_ATTR RCSwitch::receiveProtocol(const int p, unsigned int changeCount) {
-#if defined(ESP8266) || defined(ESP32)
+#ifdef ESP8266
     const Protocol &pro = proto[p-1];
 #else
     Protocol pro;
