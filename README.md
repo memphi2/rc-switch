@@ -1,10 +1,10 @@
-# rc-switch-mc
+# rc-switch-ewfs
 [![Build Status](https://travis-ci.org/sui77/rc-switch.svg?branch=master)](https://travis-ci.org/sui77/rc-switch)
 
 Use your Arduino or Raspberry Pi to operate Warema EWFS
 
 ## Info
-### Send RC codes
+### Send RC codes for Warema EWFS / Manchester encoded
 
 Use your Arduino or Raspberry Pi to operate remote radio controlled devices.
 This will most likely work with all popular low cost power outlet sockets. If
@@ -14,4 +14,6 @@ All you need is a Arduino or Raspberry Pi
 
 Usage: sendMC(command, dataLength, syncLength, repeat of command, delay between commands)
  
- see SendDemo.ino
+see SendDemo.ino
+ 
+decoding is not supported
