@@ -12,6 +12,6 @@ yours doesn't work, you might need to adjust the pulse length.
 
 All you need is a Arduino or Raspberry Pi
 
-Usage: sendMC(<command>, <dataLength>, <syncLength>, <repeat of command>, <delay between commands>)
+Usage: sendMC(command, dataLength, syncLength, repeat of command, delay between commands)
  
  see SendDemo.ino
