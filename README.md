@@ -6,9 +6,8 @@ Use your Arduino or Raspberry Pi to operate Warema EWFS
 ## Info
 ### Send RC codes for Warema EWFS / Manchester encoded
 
-Use your Arduino or Raspberry Pi to operate remote radio controlled devices.
-This will most likely work with all popular low cost power outlet sockets. If
-yours doesn't work, you might need to adjust the pulse length.
+Use your Arduino or Raspberry Pi to operate warema ewfs controlled devices.
+This will most likely work. If yours doesn't work, you might need to adjust the dataLength,syncLength or repeat of command.
 
 All you need is a Arduino or Raspberry Pi
 
