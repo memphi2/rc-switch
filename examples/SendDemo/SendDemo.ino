@@ -1,10 +1,11 @@
 /*
-  Example for different sending methods
+  Example for sending a warema ewfs command
   
  /*
  Usage: sendMC(<command>, <dataLength>, <syncLength>, <repeat of command>, <delay between commands>)
- commands are 0,1 and 2,3 for Sync
- *mySwitch.sendMC("301110100010111300001000130000100013",1780,5000,3,10000);
+ commands are 0,1 and s,S for Sync
+ *mySwitch.sendMC("S01110100010111S000010001S000010001S",1780,5000,3,10000);
+ *see aircontol for how to capture singnals: https://github.com/memphi2/aircontrol
  */
 
 
@@ -18,24 +19,13 @@ void setup() {
   
   // Transmitter is connected to Arduino Pin #10  
   mySwitch.enableTransmit(10);
-
-  // Optional set pulse length.
-  // mySwitch.setPulseLength(320);
-  
-  // Optional set protocol (default is 1, will work for most outlets)
-  // mySwitch.setProtocol(2);
-  
-  // Optional set number of transmission repetitions.
-  // mySwitch.setRepeatTransmit(15);
-  
+    
 }
 
 void loop() {
 
-  /* See Example: TypeA_WithDIPSwitches */
-  mySwitch.sendMC("301110100110001300001000130000100013",1780,5000,3,10000); //shutter up
+  mySwitch.sendMC("S01110100110001S000010001S000010001S",1780,5000,3,10000); //shutter up
   delay(1000);
-  mySwitch.sendMC("300110100110001300001000130000100013",1780,5000,3,10000); //shutter stop
-  delay(60000);
+
 
 }
