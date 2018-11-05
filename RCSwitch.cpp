@@ -470,12 +470,12 @@ void RCSwitch::sendMC(char* sCodeWord, int dataLength, int syncLength, int sendC
 	  
     for (int i = 0; i < strlen(sCodeWord); i++) {
 				switch (sCodeWord[i]) {
-					case '2':
+					case 's':
 						digitalWrite(this->nTransmitterPin, LOW);
 						delayMicroseconds(syncLength);
 						break;
 
-					case '3':
+					case 'S':
 						digitalWrite(this->nTransmitterPin, HIGH);
 						delayMicroseconds(syncLength);
 						break;
